@@ -20,7 +20,7 @@ export class Ajax {
      * Specifies the URL to which request to be sent.
      * @default null		
      */
-    public url: string | ((data: string | Object) => Promise<void>);
+    public url: string | ((data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>);
     /**		
      * Specifies which HTTP request method to be used. For ex., GET, POST
      * @default GET
@@ -152,7 +152,15 @@ export class Ajax {
                     if (!loadEvent) {
                         return;
                     }
-                    await url(this.data);
+                    await url(this.data, progress => {
+                        let progressEvent = new ProgressEvent('progress', progress);
+                        if (!isNullOrUndefined(this.onProgress)) {
+                            this.onProgress.call(this.httpRequest, progressEvent);
+                        }
+                        if (!isNullOrUndefined(this.onUploadProgress)) {
+                            this.onUploadProgress.call(this.httpRequest, progressEvent);
+                        }
+                    });
                     resolve(this.successHandler(undefined));
                 }).catch((err: any) => {
                     if (this.emitError) {

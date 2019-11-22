@@ -24,8 +24,8 @@ export class AjaxSettings extends ChildProperty<AjaxSettings> {
      */
     @Property(null)
     public uploadUrl: string | {
-        remove: (data: string | Object) => Promise<void>;
-        save: (data: string | Object) => Promise<void>;
+        remove: (data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>;
+        save: (data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>;
     };
 
     /**
@@ -33,6 +33,6 @@ export class AjaxSettings extends ChildProperty<AjaxSettings> {
      * @default null
      */
     @Property(null)
-    public url: string | ((data: string | Object) => Promise<void>);
+    public url: string | ((data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>);
 }
 

@@ -98,7 +98,7 @@ export class AsyncSettings  extends ChildProperty<AsyncSettings> {
      * @default ''
      */
     @Property('')
-    public saveUrl: string | ((data: string | Object) => Promise<void>);
+    public saveUrl: string | ((data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>);
     /**
      * Specifies the URL of remove action that receives the file information and handle the remove operation in server.
      * The remove action type must be POST request and define “removeFileNames” attribute to get file information that will be removed.
@@ -106,7 +106,7 @@ export class AsyncSettings  extends ChildProperty<AsyncSettings> {
      * @default ''
      */
     @Property('')
-    public removeUrl: string | ((data: string | Object) => Promise<void>);
+    public removeUrl: string | ((data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>);
     /**
      * Specifies the chunk size to split the large file into chunks, and upload it to the server in a sequential order.
      * If the chunk size property has value, the uploader enables the chunk upload by default.

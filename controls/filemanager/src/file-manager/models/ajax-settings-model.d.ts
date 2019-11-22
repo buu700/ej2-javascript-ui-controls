@@ -22,14 +22,14 @@ export interface AjaxSettingsModel {
      * @default null
      */
     uploadUrl?: string | {
-        remove: (data: string | Object) => Promise<void>;
-        save: (data: string | Object) => Promise<void>;
+        remove: (data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>;
+        save: (data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>;
     };
 
     /**
      * Specifies URL to read the files from server.
      * @default null
      */
-    url?: string | ((data: string | Object) => Promise<void>);
+    url?: string | ((data: string | Object, onProgress: (progress: ProgressEventInit) => void) => Promise<void>);
 
 }
