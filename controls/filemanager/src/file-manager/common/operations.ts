@@ -134,7 +134,7 @@ function createAjax(
                         let result: ReadArgs = {
                             error: {
                                 fileExists: null,
-                                message: 'ServerError: Invalid response from ' + parent.ajaxSettings.url,
+                                message: 'ServerError: Invalid response from ' + (typeof parent.ajaxSettings.url === 'function' ? 'URL function' : parent.ajaxSettings.url),
                                 code: '406',
                             },
                             files: null,
@@ -186,7 +186,7 @@ function createAjax(
                         files: null,
                         error: {
                             code: '404',
-                            message: 'NetworkError: Failed to send on XMLHTTPRequest: Failed to load ' + parent.ajaxSettings.url,
+                            message: 'NetworkError: Failed to send on XMLHTTPRequest: Failed to load ' + (typeof parent.ajaxSettings.url === 'function' ? 'URL function' : parent.ajaxSettings.url),
                             fileExists: null
                         },
                     };
@@ -404,7 +404,18 @@ function searchSuccess(parent: IFileManager, result: ReadArgs, event: string): v
 }
 /* istanbul ignore next */
 export function Download(parent: IFileManager, path: string, items: string[]): void {
-    let downloadUrl: string = parent.ajaxSettings.downloadUrl ? parent.ajaxSettings.downloadUrl : parent.ajaxSettings.url;
+    const downloadUrl = parent.ajaxSettings.downloadUrl ? parent.ajaxSettings.downloadUrl : parent.ajaxSettings.url;
+    if (typeof downloadUrl === 'function') {
+        if (downloadUrl !== parent.ajaxSettings.downloadUrl) {
+            throw new Error('Invalid downloadUrl.');
+        }
+        downloadUrl(
+            path,
+            items.map((name, i) => ({data: parent.itemData[i], name}))
+        );
+        return;
+    }
+
     let data: Object = { 'action': 'download', 'path': path, 'names': items, 'data': parent.itemData };
     let form: HTMLElement = createElement('form', {
         id: parent.element.id + '_downloadForm',

@@ -567,13 +567,13 @@ export class DetailsView {
             return;
         }
         let eventArgs: FileOpenEventArgs = { cancel: false, fileDetails: data, module: 'DetailsView' };
-        this.parent.trigger('fileOpen', eventArgs, (fileOpenArgs: FileOpenEventArgs) => {
+        this.parent.trigger('fileOpen', eventArgs, async (fileOpenArgs: FileOpenEventArgs) => {
             if (!fileOpenArgs.cancel) {
                 let name: string = getValue('name', data);
                 if (getValue('isFile', data)) {
                     let icon: string = fileType(data);
                     if (icon === CLS.ICON_IMAGE) {
-                        let imgUrl: string = getImageUrl(this.parent, data);
+                        let imgUrl: string = await getImageUrl(this.parent, data);
                         createImageDialog(this.parent, name, imgUrl);
                     }
                 } else {

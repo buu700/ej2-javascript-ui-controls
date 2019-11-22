@@ -20,7 +20,7 @@ export class Ajax {
      * Specifies the URL to which request to be sent.
      * @default null		
      */
-    public url: string;
+    public url: string | ((data: string | Object) => Promise<void>);
     /**		
      * Specifies which HTTP request method to be used. For ex., GET, POST
      * @default GET
@@ -84,6 +84,7 @@ export class Ajax {
      * @return {Promise}
      */
     public send(data?: string | Object): Promise<Ajax> {
+        const url = this.url;
         this.data = isNullOrUndefined(data) ? this.data : data;
         let eventArgs: BeforeSendEventArgs = {
             cancel: false,
@@ -91,27 +92,33 @@ export class Ajax {
         };
         let promise: Promise<Ajax> = new Promise((resolve: Function, reject: Function) => {
             this.httpRequest = new XMLHttpRequest();
-            this.httpRequest.onreadystatechange = () => { this.stateChange(resolve, reject); };
-            if (!isNullOrUndefined(this.onLoad)) {
-                this.httpRequest.onload = this.onLoad;
+            if (typeof url !== 'function') {
+                this.httpRequest.onreadystatechange = () => { this.stateChange(resolve, reject); };
+                if (!isNullOrUndefined(this.onLoad)) {
+                    this.httpRequest.onload = this.onLoad;
+                }
+                if (!isNullOrUndefined(this.onProgress)) {
+                    this.httpRequest.onprogress = this.onProgress;
+                }
+                /* istanbul ignore next */
+                if (!isNullOrUndefined(this.onAbort)) {
+                    this.httpRequest.onabort = this.onAbort;
+                }
+                /* istanbul ignore next */
+                if (!isNullOrUndefined(this.onError)) {
+                    this.httpRequest.onerror = this.onError;
+                }
+                //** Upload Events **/
+                /* istanbul ignore next */
+                if (!isNullOrUndefined(this.onUploadProgress)) {
+                    this.httpRequest.upload.onprogress = this.onUploadProgress;
+                }
             }
-            if (!isNullOrUndefined(this.onProgress)) {
-                this.httpRequest.onprogress = this.onProgress;
-            }
-            /* istanbul ignore next */
-            if (!isNullOrUndefined(this.onAbort)) {
-                this.httpRequest.onabort = this.onAbort;
-            }
-            /* istanbul ignore next */
-            if (!isNullOrUndefined(this.onError)) {
-                this.httpRequest.onerror = this.onError;
-            }
-            //** Upload Events **/
-            /* istanbul ignore next */
-            if (!isNullOrUndefined(this.onUploadProgress)) {
-                this.httpRequest.upload.onprogress = this.onUploadProgress;
-            }
-            this.httpRequest.open(this.type, this.url, this.mode);
+            this.httpRequest.open(
+                this.type,
+                typeof url === 'function' ? 'data:,' : url,
+                this.mode
+            );
             // Set default headers
             if (!isNullOrUndefined(this.data) && this.contentType !== null) {
                 this.httpRequest.setRequestHeader('Content-Type', this.contentType || 'application/json; charset=utf-8');
@@ -120,9 +127,48 @@ export class Ajax {
                 eventArgs.httpRequest = this.httpRequest;
                 this.beforeSend(eventArgs);
             }
-            if (!eventArgs.cancel) {
-                this.httpRequest.send(!isNullOrUndefined(this.data) ? this.data as Document : null);
+            if (eventArgs.cancel) {
+                return;
             }
+            if (typeof url === 'function') {
+                new Promise<ProgressEvent<EventTarget>>((
+                    loadEventResolve,
+                    loadEventReject
+                ) => {
+                    this.httpRequest.onload = loadEventResolve;
+                    this.httpRequest.onabort = abortEvent => loadEventReject({abortEvent});
+                    this.httpRequest.onerror = errorEvent => loadEventReject({errorEvent});
+                }).catch(({abortEvent, errorEvent}) => {
+                    /* istanbul ignore next */
+                    if (abortEvent && !isNullOrUndefined(this.onAbort)) {
+                        this.onAbort.call(this.httpRequest, abortEvent);
+                    }
+                    /* istanbul ignore next */
+                    if (errorEvent && !isNullOrUndefined(this.onError)) {
+                        this.onError.call(this.httpRequest, errorEvent);
+                    }
+                    throw new Error('Add data: to your Content Security Policy connect-src.');
+                }).then(async loadEvent => {
+                    if (!loadEvent) {
+                        return;
+                    }
+                    await url(this.data);
+                    resolve(this.successHandler(undefined));
+                }).catch((err: any) => {
+                    if (this.emitError) {
+                        reject(new Error(this.failureHandler(
+                            typeof err === 'string' ?
+                                err :
+                            err instanceof Error ?
+                                err.message :
+                                ''
+                        )));
+                    } else {
+                        resolve();
+                    }
+                });
+            }
+            this.httpRequest.send(!isNullOrUndefined(this.data) ? this.data as Document : null);
         });
         return promise;
     }

@@ -100,7 +100,7 @@ export class LargeIconsView {
         };
     }
 
-    private render(args: ReadArgs): void {
+    private async render(args: ReadArgs): Promise<void> {
         this.parent.visitedItem = null;
         this.startItem = null;
         showSpinner(this.parent.element);
@@ -128,7 +128,7 @@ export class LargeIconsView {
                 itemCreated: this.onItemCreated.bind(this),
             };
             this.items = [];
-            this.items = this.renderList(args);
+            this.items = await this.renderList(args);
             this.items = getSortedData(this.parent, this.items);
             this.listElements = ListBase.createListFromJson(createElement, <{ [key: string]: Object; }[]>this.items, this.listObj);
             this.itemList = Array.prototype.slice.call(selectAll('.' + CLS.LIST_ITEM, this.listElements));
@@ -323,7 +323,7 @@ export class LargeIconsView {
         }
     }
 
-    private renderList(args?: ReadArgs): Object[] {
+    private async renderList(args?: ReadArgs): Promise<Object[]> {
         let i: number = 0;
         let items: Object[] = JSON.parse(JSON.stringify(args.files));
         while (i < items.length) {
@@ -337,7 +337,7 @@ export class LargeIconsView {
                 className += ' ' + getAccessClass(items[i]);
             }
             if (icon === CLS.ICON_IMAGE && this.parent.showThumbnail && hasReadAccess(items[i])) {
-                let imgUrl: string = getImageUrl(this.parent, items[i]);
+                let imgUrl: string = await getImageUrl(this.parent, items[i]);
                 setValue('_fm_imageUrl', imgUrl, items[i]);
                 setValue('_fm_imageAttr', { alt: name }, items[i]);
             } else {
@@ -844,7 +844,7 @@ export class LargeIconsView {
                 return;
             }
             let eventArgs: FileOpenEventArgs = { cancel: false, fileDetails: details, module: 'LargeIconsView' };
-            this.parent.trigger('fileOpen', eventArgs, (fileOpenArgs: FileOpenEventArgs) => {
+            this.parent.trigger('fileOpen', eventArgs, async (fileOpenArgs: FileOpenEventArgs) => {
                 if (!fileOpenArgs.cancel) {
                     let text: string = getValue('name', details);
                     if (!this.parent.isFile) {
@@ -865,7 +865,7 @@ export class LargeIconsView {
                     } else {
                         let icon: string = fileType(details);
                         if (icon === CLS.ICON_IMAGE) {
-                            let imgUrl: string = getImageUrl(this.parent, details);
+                            let imgUrl: string = await getImageUrl(this.parent, details);
                             createImageDialog(this.parent, text, imgUrl);
                         }
                     }

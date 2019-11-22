@@ -794,12 +794,12 @@ export class FileManager extends Component<HTMLElement> implements INotifyProper
     }
 
     private renderUploadBox(): void {
-        let uploadUrl: string = this.ajaxSettings.uploadUrl ? this.ajaxSettings.uploadUrl : this.ajaxSettings.url;
+        let uploadUrl = this.ajaxSettings.uploadUrl ? this.ajaxSettings.uploadUrl : this.ajaxSettings.url;
         this.uploadObj = new Uploader({
             dropArea: <HTMLElement>select('#' + this.element.id + CLS.CONTENT_ID, this.element),
             asyncSettings: {
-                saveUrl: uploadUrl,
-                removeUrl: uploadUrl
+                saveUrl: typeof uploadUrl === 'object' ? uploadUrl.save : uploadUrl,
+                removeUrl: typeof uploadUrl === 'object' ? uploadUrl.remove : uploadUrl
             },
             locale: this.locale,
             enableRtl: this.enableRtl,
@@ -889,7 +889,7 @@ export class FileManager extends Component<HTMLElement> implements INotifyProper
         }
         let data: string = JSON.stringify(getValue(this.pathId[this.pathId.length - 1], this.feParent));
         args.customFormData = [{ 'path': this.path }, { 'action': action }, { 'data': data }];
-        let uploadUrl: string = this.ajaxSettings.uploadUrl ? this.ajaxSettings.uploadUrl : this.ajaxSettings.url;
+        let uploadUrl = this.ajaxSettings.uploadUrl ? this.ajaxSettings.uploadUrl : this.ajaxSettings.url;
         let ajaxSettings: Object = {
             url: uploadUrl,
             type: 'POST',

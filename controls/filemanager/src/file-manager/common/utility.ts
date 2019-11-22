@@ -287,20 +287,34 @@ export function fileType(file: Object): string {
     return iconType;
 }
 /* istanbul ignore next */
-export function getImageUrl(parent: IFileManager, item: Object): string {
-    let baseUrl: string = parent.ajaxSettings.getImageUrl ? parent.ajaxSettings.getImageUrl : parent.ajaxSettings.url;
+export async function getImageUrl(parent: IFileManager, item: Object): Promise<string> {
+    const baseUrl = parent.ajaxSettings.getImageUrl ? parent.ajaxSettings.getImageUrl : parent.ajaxSettings.url;
+    if (typeof baseUrl === 'function' && baseUrl !== parent.ajaxSettings.getImageUrl) {
+        throw new Error('Invalid getImageUrl.');
+    }
+
     let imgUrl: string;
     let fileName: string = getValue('name', item);
     let fPath: string = getValue('filterPath', item);
     if (parent.hasId) {
         let imgId: string = getValue('id', item);
-        imgUrl = baseUrl + '?path=' + parent.path + '&id=' + imgId;
+        imgUrl = typeof baseUrl === 'function' ?
+            await baseUrl(parent.path, imgId) :
+            baseUrl + '?path=' + parent.path + '&id=' + imgId;
     } else if (!isNOU(fPath)) {
-        imgUrl = baseUrl + '?path=' + fPath.replace(/\\/g, '/') + fileName;
+        let path: string = fPath.replace(/\\/g, '/') + fileName;
+        imgUrl = typeof baseUrl === 'function' ?
+            await baseUrl(path) :
+            baseUrl + '?path=' + path;
     } else {
-        imgUrl = baseUrl + '?path=' + parent.path + fileName;
+        let path: string = parent.path + fileName;
+        imgUrl = typeof baseUrl === 'function' ?
+            await baseUrl(path) :
+            baseUrl + '?path=' + path;
     }
-    imgUrl = imgUrl + '&time=' + (new Date().getTime()).toString();
+    if (typeof baseUrl !== 'function') {
+        imgUrl = imgUrl + '&time=' + (new Date().getTime()).toString();
+    }
     return imgUrl;
 }
 /* istanbul ignore next */

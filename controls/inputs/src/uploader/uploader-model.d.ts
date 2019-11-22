@@ -63,7 +63,7 @@ export interface AsyncSettingsModel {
      * The upload operations could not perform without this property.
      * @default ''
      */
-    saveUrl?: string;
+    saveUrl?: string | ((data: string | Object) => Promise<void>);
 
     /**
      * Specifies the URL of remove action that receives the file information and handle the remove operation in server.
@@ -71,7 +71,7 @@ export interface AsyncSettingsModel {
      * This property is optional.
      * @default ''
      */
-    removeUrl?: string;
+    removeUrl?: string | ((data: string | Object) => Promise<void>);
 
     /**
      * Specifies the chunk size to split the large file into chunks, and upload it to the server in a sequential order.
