@@ -8,7 +8,7 @@
 	"module": "./index.js",
 	"es2015": "./dist/es6/ej2-inputs.es2015.js",
 	"dependencies": {
-		"@syncfusion/ej2-base": "*",
+		"@syncfusion/ej2-base": "https://github.com/buu700/ej2-javascript-ui-controls#build-base",
 		"@syncfusion/ej2-buttons": "*",
 		"@syncfusion/ej2-popups": "*",
 		"@syncfusion/ej2-splitbuttons": "*"
