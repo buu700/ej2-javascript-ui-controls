@@ -8,7 +8,9 @@
 	"module": "./index.js",
 	"es2015": "./dist/es6/ej2-filemanager.es2015.js",
 	"dependencies": {
+		"@syncfusion/ej2-base": "https://github.com/buu700/ej2-javascript-ui-controls#build-base",
 		"@syncfusion/ej2-grids": "*",
+		"@syncfusion/ej2-inputs": "https://github.com/buu700/ej2-javascript-ui-controls#build-inputs",
 		"@syncfusion/ej2-layouts": "*",
 		"selenium-webdriver": "^4.0.0-alpha.1"
 	},
