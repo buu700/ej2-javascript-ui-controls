@@ -131,7 +131,7 @@ export class Ajax {
                 return;
             }
             if (typeof url === 'function') {
-                new Promise<ProgressEvent<EventTarget>>((
+                new Promise<ProgressEvent>((
                     loadEventResolve,
                     loadEventReject
                 ) => {
