@@ -315,7 +315,7 @@ export class Draggable extends Base<HTMLElement> implements INotifyPropertyChang
     /**
      * @private
      */
-    public initialPosition: PageInfo;
+    public initialPosition: any;
     private relativeXPosition: number;
     private relativeYPosition: number;
     private margin: PositionCoordinates;
