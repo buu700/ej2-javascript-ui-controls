@@ -49,7 +49,7 @@
 		"url": "https://github.com/syncfusion/ej2-filemanager.git"
 	},
 	"scripts": {
-		"build": "gulp build",
+		"build": "gulp build && webpack --mode production src/index.js -o dist/ej2-filemanager.umd.min.js",
 		"test": "gulp test"
 	},
 	"typings": "index.d.ts"
