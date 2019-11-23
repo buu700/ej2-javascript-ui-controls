@@ -140,12 +140,13 @@ export function append(fromElements: Element[] | NodeList, toElement: Element, i
 
 function executeScript(ele: Element): void {
     let eleArray: NodeList = ele.querySelectorAll('script');
-    Array.from(eleArray).forEach((element: Element) => {
+    for (let i = 0 ; i < eleArray.length ; ++i) {
+        const element: Element = <any> eleArray[i];
         let script: HTMLScriptElement = document.createElement('script');
         script.text = element.innerHTML;
         document.head.appendChild(script);
         detach(script);
-    });
+    }
 }
 
 /**

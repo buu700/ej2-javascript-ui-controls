@@ -135,7 +135,7 @@ export class Ajax {
                     loadEventResolve,
                     loadEventReject
                 ) => {
-                    this.httpRequest.onload = loadEventResolve;
+                    this.httpRequest.onload = loadEvent => loadEventResolve(loadEvent);
                     this.httpRequest.onabort = abortEvent => loadEventReject({abortEvent});
                     this.httpRequest.onerror = errorEvent => loadEventReject({errorEvent});
                 }).catch(({abortEvent, errorEvent}) => {
