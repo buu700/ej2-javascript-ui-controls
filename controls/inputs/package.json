@@ -95,7 +95,7 @@
 		"url": "https://github.com/syncfusion/ej2-javascript-ui-controls/tree/master/controls/inputs"
 	},
 	"scripts": {
-		"build": "gulp build",
+		"build": "gulp build && webpack --mode production src/index.js -o dist/ej2-inputs.umd.min.js",
 		"test": "gulp test"
 	}
 }
